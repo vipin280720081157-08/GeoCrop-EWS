@@ -26,19 +26,28 @@
 // ---------------------------------------------------------------------
 // CONFIGURATION — edit these values for your deployment
 // ---------------------------------------------------------------------
-const char* WIFI_SSID     = "YOUR_WIFI_SSID";
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID     = "Vipin";
+const char* WIFI_PASSWORD = "vipin2807";
 
-// Backend URL — local dev example: "http://192.168.1.50:8000"
-// Production (Render) example: "https://geocrop-ews-api.onrender.com"
-const char* BACKEND_URL   = "http://192.168.1.50:8000";
+// Your deployed backend on Render
+const char* BACKEND_URL   = "https://geocrop-ews-api.onrender.com";
+
 const char* DEVICE_ID     = "ESP32_01";
-const char* CROP          = "Rice";           // "Rice" or "Tomato"
+
+// These can be changed later
+const char* CROP          = "Rice";
 const char* GROWTH_STAGE  = "Panicle Initiation";
 
-const unsigned long SEND_INTERVAL_MS = 30000;  // 30 seconds, per spec
-const unsigned long RETRY_DELAY_MS   = 5000;   // wait before retrying a failed POST
+
+// Send sensor data every 30 seconds
+const unsigned long SEND_INTERVAL_MS = 30000;
+
+// Wait 5 seconds before retrying a failed request
+const unsigned long RETRY_DELAY_MS = 5000;
+
+// Retry failed HTTP requests 3 times
 const int MAX_RETRIES = 3;
+
 
 // ---------------------------------------------------------------------
 // PIN CONFIGURATION
