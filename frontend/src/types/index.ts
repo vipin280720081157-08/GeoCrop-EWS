@@ -1,5 +1,5 @@
 export type RiskLevel = "Low" | "Medium" | "High";
-export type Crop = "Rice" | "Tomato";
+export type Crop = "Paddy" | "Turmeric" | "Tomato";
 
 export interface SensorReading {
   id: number;
@@ -32,12 +32,13 @@ export interface Prediction {
   disease: string;
   risk_level: RiskLevel;
   risk_score: number;
-  confidence: number;
+  confidence?: number | null;
   readiness_score?: number | null;
   readiness_label?: string | null;
   factors: ContributingFactor[];
   recommendations: Recommendation[];
   explanation?: string | null;
+  source?: "trained_model" | "rule_based_fallback" | string;
   created_at?: string | null;
 }
 
@@ -71,10 +72,6 @@ export interface AppSettings {
   humidity_threshold: number;
   soil_threshold: number;
   risk_threshold: number;
-  notify_high_risk: boolean;
-  notify_daily_report: boolean;
-  notify_sensor_offline: boolean;
-  notify_weekly_summary: boolean;
 }
 
 export interface ReportMeta {
@@ -82,4 +79,15 @@ export interface ReportMeta {
   report_type: string;
   file_name: string;
   created_at: string;
+}
+
+export type StatusState = "ready" | "online" | "receiving" | "connected" | "available" | "fixed" | "checking" | "waiting" | "unavailable" | "offline" | "no_data";
+
+export interface SystemStatus {
+  application: "ready";
+  backend: "online" | "checking" | "unavailable";
+  dataService: "receiving" | "checking" | "no_data";
+  hardware: "connected" | "checking" | "offline";
+  aiModel: "available" | "checking" | "unavailable";
+  gps: "fixed" | "waiting" | "unavailable";
 }

@@ -133,7 +133,7 @@ def generate_report_pdf(report_type: str, sensor: dict, prediction: dict, recomm
 
     c.setFillColorRGB(*COLORS["secondary_text"])
     c.setFont("Helvetica-Oblique", 8)
-    c.drawString(margin, 15 * mm, "Generated automatically by the GeoCrop EWS Decision Support Engine.")
+    c.drawString(margin, 15 * mm, "Generated automatically by the GeoCrop Decision Support Engine.")
 
     c.showPage()
     c.save()

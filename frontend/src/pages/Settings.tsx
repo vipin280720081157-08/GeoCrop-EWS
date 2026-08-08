@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Sprout, Ruler, SlidersHorizontal, LayoutDashboard, BellRing, RadioTower, Info, Check } from "lucide-react";
+import { Sprout, Ruler, SlidersHorizontal, Sun, Moon, RadioTower, Info, Check } from "lucide-react";
 import Card from "@/components/Card";
 import SectionTitle from "@/components/SectionTitle";
 import Button from "@/components/Button";
@@ -8,10 +8,14 @@ import StatusDot from "@/components/StatusDot";
 import Skeleton from "@/components/Skeleton";
 import { fetchSettings, updateSettings } from "@/services/settingsService";
 import { useSensorData } from "@/hooks/useSensorData";
-import type { AppSettings } from "@/types";
+import type { AppSettings, Crop } from "@/types";
+import { useApp } from "@/context/AppContext";
+import { SUPPORTED_CROPS, type SupportedCrop } from "@/utils/constants";
 
 export default function Settings() {
   const { connected } = useSensorData();
+  const { crop, setCrop, theme, toggleTheme, systemStatus } = useApp();
+
   const [settings, setSettingsState] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,92 +45,148 @@ export default function Settings() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 md:gap-8">
       {saved && (
-        <div className="fade-in flex items-center gap-2.5 bg-successLight text-success px-4 py-3 rounded-lg text-sm font-semibold">
+        <div className="fade-in flex items-center gap-2.5 bg-successLight text-success px-4 py-3 rounded-lg text-sm font-semibold border border-success">
           <Check size={18} /> Settings saved successfully.
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <Card>
-          <SectionTitle icon={Sprout}>Crop Selection</SectionTitle>
-          <div className="flex gap-2.5">
-            {(["Rice", "Tomato"] as const).map((c) => (
-              <button
-                key={c}
-                onClick={() => update({ crop: c })}
-                className={`flex-1 p-3 rounded-lg border-[1.5px] font-semibold flex flex-col items-center gap-1.5 ${settings.crop === c ? "border-primary bg-primaryLight text-primary" : "border-borderC text-textPrimary"}`}
-              >
-                <Sprout size={22} /> {c}
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <SectionTitle icon={Ruler}>Units</SectionTitle>
-          <div className="flex flex-col">
-            <ToggleRow label="Temperature Unit" options={["Celsius", "Fahrenheit"]} value={settings.temp_unit} onChange={(v) => update({ temp_unit: v as AppSettings["temp_unit"] })} />
-            <ToggleRow label="Rainfall Unit" options={["mm", "inches"]} value={settings.rain_unit} onChange={(v) => update({ rain_unit: v as AppSettings["rain_unit"] })} />
-          </div>
-        </Card>
-      </div>
-
+      {/* 1. Crop Selection */}
       <Card>
-        <SectionTitle icon={SlidersHorizontal}>Alert Threshold Values</SectionTitle>
-        <ThresholdSlider label="Humidity Warning Threshold" value={settings.humidity_threshold} min={40} max={100} unit="%" onChange={(v) => update({ humidity_threshold: v })} />
-        <ThresholdSlider label="Soil Moisture Warning Threshold" value={settings.soil_threshold} min={30} max={100} unit="%" onChange={(v) => update({ soil_threshold: v })} />
-        <ThresholdSlider label="High Risk Score Threshold" value={settings.risk_threshold} min={50} max={95} unit="" onChange={(v) => update({ risk_threshold: v })} />
+        <SectionTitle icon={Sprout}>Active Crop Selection</SectionTitle>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {SUPPORTED_CROPS.map((c) => (
+            <button
+              key={c}
+              onClick={() => {
+                setCrop(c as SupportedCrop);
+                update({ crop: c as Crop });
+              }}
+              className={`p-3.5 rounded-lg border-[1.5px] font-semibold flex flex-col items-center gap-2 transition-all ${
+                crop === c
+                  ? "border-primary bg-primaryLight text-primary shadow-sm"
+                  : "border-borderC bg-card text-textPrimary hover:bg-bg"
+              }`}
+            >
+              <Sprout size={24} />
+              <span>{c}</span>
+            </button>
+          ))}
+        </div>
       </Card>
 
+      {/* 2. Theme & 3. Display Units */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <Card>
-          <SectionTitle icon={LayoutDashboard}>Theme Preference</SectionTitle>
-          <div className="flex gap-2.5">
-            <button className="flex-1 p-3 rounded-lg border-[1.5px] border-primary bg-primaryLight text-primary font-semibold">Light (Active)</button>
-            <button disabled className="flex-1 p-3 rounded-lg border-[1.5px] border-borderC bg-gray-100 text-textDisabled font-semibold cursor-not-allowed">Dark (Coming soon)</button>
+          <SectionTitle icon={Sun}>Theme Preference</SectionTitle>
+          <div className="flex gap-3">
+            <button
+              onClick={() => theme === "dark" && toggleTheme()}
+              className={`flex-1 p-3.5 rounded-lg border-[1.5px] font-semibold flex items-center justify-center gap-2 ${
+                theme === "light"
+                  ? "border-primary bg-primaryLight text-primary"
+                  : "border-borderC bg-card text-textSecondary"
+              }`}
+            >
+              <Sun size={20} /> Light Theme
+            </button>
+            <button
+              onClick={() => theme === "light" && toggleTheme()}
+              className={`flex-1 p-3.5 rounded-lg border-[1.5px] font-semibold flex items-center justify-center gap-2 ${
+                theme === "dark"
+                  ? "border-primary bg-primaryLight text-primary"
+                  : "border-borderC bg-card text-textSecondary"
+              }`}
+            >
+              <Moon size={20} /> Dark Theme
+            </button>
           </div>
         </Card>
 
         <Card>
-          <SectionTitle icon={BellRing}>Notification Preferences</SectionTitle>
-          <div className="flex flex-col">
-            <SwitchRow label="High risk disease alerts" value={settings.notify_high_risk} onChange={(v) => update({ notify_high_risk: v })} />
-            <SwitchRow label="Daily report ready" value={settings.notify_daily_report} onChange={(v) => update({ notify_daily_report: v })} />
-            <SwitchRow label="Sensor offline warning" value={settings.notify_sensor_offline} onChange={(v) => update({ notify_sensor_offline: v })} />
-            <SwitchRow label="Weekly summary email" value={settings.notify_weekly_summary} onChange={(v) => update({ notify_weekly_summary: v })} />
+          <SectionTitle icon={Ruler}>Display Units</SectionTitle>
+          <div className="flex flex-col gap-2">
+            <ToggleRow
+              label="Temperature Unit"
+              options={["Celsius", "Fahrenheit"]}
+              value={settings.temp_unit}
+              onChange={(v) => update({ temp_unit: v as AppSettings["temp_unit"] })}
+            />
+            <ToggleRow
+              label="Rainfall Unit"
+              options={["mm", "inches"]}
+              value={settings.rain_unit}
+              onChange={(v) => update({ rain_unit: v as AppSettings["rain_unit"] })}
+            />
           </div>
         </Card>
       </div>
 
+      {/* 4. Alert Threshold Values */}
+      <Card>
+        <SectionTitle icon={SlidersHorizontal}>Decision Support Rule Thresholds</SectionTitle>
+        <ThresholdSlider
+          label="Humidity Warning Threshold"
+          value={settings.humidity_threshold}
+          min={40}
+          max={100}
+          unit="%"
+          onChange={(v) => update({ humidity_threshold: v })}
+        />
+        <ThresholdSlider
+          label="Soil Moisture Warning Threshold"
+          value={settings.soil_threshold}
+          min={30}
+          max={100}
+          unit="%"
+          onChange={(v) => update({ soil_threshold: v })}
+        />
+        <ThresholdSlider
+          label="High Risk Score Threshold"
+          value={settings.risk_threshold}
+          min={50}
+          max={95}
+          unit=""
+          onChange={(v) => update({ risk_threshold: v })}
+        />
+      </Card>
+
+      {/* 5. System Information & 6. About */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <Card>
           <SectionTitle icon={RadioTower}>System Information</SectionTitle>
           <div className="flex flex-col">
-            <Row label="Device ID" value="ESP32_01" />
-            <Row label="Connection" value={<StatusDot connected={connected} />} />
-            <Row label="Sensor Update Interval" value="30 seconds" />
-            <Row label="Database" value={import.meta.env.PROD ? "PostgreSQL" : "SQLite"} />
-            <Row label="ML Model" value="Random Forest (see backend/model)" />
+            <Row label="Hardware Device ID" value="ESP32_01" />
+            <Row label="Hardware Connection" value={<StatusDot connected={connected} />} />
+            <Row label="Data Telemetry Rate" value="30 seconds" />
+            <Row
+              label="AI Model Status"
+              value={systemStatus.aiModel === "available" ? "Trained Model Active" : "Baseline Rule Engine Active"}
+            />
+            <Row label="Database Engine" value={import.meta.env.PROD ? "PostgreSQL" : "SQLite"} />
           </div>
         </Card>
 
         <Card>
-          <SectionTitle icon={Info}>About This Project</SectionTitle>
+          <SectionTitle icon={Info}>About GeoCrop</SectionTitle>
           <p className="text-sm text-textPrimary leading-relaxed m-0">
-            The Geographic Crop Disease Early Warning and Decision Support System combines IoT
-            sensing, machine learning, GIS, and decision support to help farmers identify crop
-            disease risk before visible symptoms appear — enabling timely, preventive
-            agricultural management for rice and tomato crops.
+            <strong>GeoCrop</strong> — Geographic Crop Disease Early Warning &amp; Decision Support System.
+            Combines real-time IoT sensing, agronomic machine learning, GIS mapping, and decision support
+            to detect crop disease risk before visible symptoms appear for Paddy, Turmeric, and Tomato.
           </p>
-          <div className="mt-3 text-xs text-textSecondary">GeoCrop EWS · v1.0.0</div>
+          <div className="mt-4 text-xs text-textSecondary border-t border-borderC pt-3">
+            GeoCrop · Operational Instrument v1.0.0
+          </div>
         </Card>
       </div>
 
+      {/* Actions */}
       <div className="flex justify-end gap-3">
         <Button variant="outline" onClick={() => fetchSettings().then(setSettingsState)}>Cancel</Button>
-        <Button variant="primary" icon={Check} onClick={save} disabled={saving}>{saving ? "Saving…" : "Save Settings"}</Button>
+        <Button variant="primary" icon={Check} onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save Settings"}
+        </Button>
       </div>
     </div>
   );
@@ -134,11 +194,19 @@ export default function Settings() {
 
 function ToggleRow({ label, options, value, onChange }: { label: string; options: string[]; value: string; onChange: (v: string) => void }) {
   return (
-    <div className="flex items-center justify-between py-2">
+    <div className="flex items-center justify-between py-2 border-b border-borderC last:border-b-0">
       <span className="text-sm text-textSecondary">{label}</span>
       <div className="flex bg-bg rounded-lg p-0.5 border border-borderC">
         {options.map((o) => (
-          <button key={o} onClick={() => onChange(o)} className={`py-1.5 px-3 rounded-md text-xs font-semibold ${value === o ? "bg-primary text-white" : "text-textSecondary"}`}>{o}</button>
+          <button
+            key={o}
+            onClick={() => onChange(o)}
+            className={`py-1 px-3 rounded-md text-xs font-semibold ${
+              value === o ? "bg-primary text-white" : "text-textSecondary"
+            }`}
+          >
+            {o}
+          </button>
         ))}
       </div>
     </div>
@@ -147,23 +215,19 @@ function ToggleRow({ label, options, value, onChange }: { label: string; options
 
 function ThresholdSlider({ label, value, min, max, unit, onChange }: { label: string; value: number; min: number; max: number; unit: string; onChange: (v: number) => void }) {
   return (
-    <div className="mb-4">
-      <div className="flex justify-between mb-2 text-sm">
-        <span className="text-textSecondary">{label}</span>
+    <div className="mb-4 last:mb-0">
+      <div className="flex justify-between mb-1.5 text-sm">
+        <span className="text-textSecondary font-medium">{label}</span>
         <span className="font-bold text-textPrimary">{value}{unit}</span>
       </div>
-      <input type="range" min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-primary h-1.5" />
-    </div>
-  );
-}
-
-function SwitchRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div className="flex items-center justify-between py-2.5">
-      <span className="text-sm text-textPrimary">{label}</span>
-      <button onClick={() => onChange(!value)} className="w-[42px] h-6 rounded-full relative transition-colors" style={{ background: value ? "#2E7D32" : "#CFD8DC" }}>
-        <span className="absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white transition-all shadow" style={{ left: value ? 21 : 3 }} />
-      </button>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full accent-primary h-1.5 bg-borderC rounded-lg cursor-pointer"
+      />
     </div>
   );
 }

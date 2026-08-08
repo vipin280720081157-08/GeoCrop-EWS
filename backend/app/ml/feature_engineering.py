@@ -8,12 +8,19 @@ explanations regardless of which prediction path is used.
 from typing import Dict, List, Tuple
 
 CROP_PROFILES: Dict[str, dict] = {
-    "Rice": {
+    "Paddy": {
         "growth_stages": ["Seedling", "Tillering", "Panicle Initiation", "Flowering", "Grain Filling", "Maturity"],
         "temp_opt": (24, 32),
         "humidity_opt": (55, 75),
         "soil_opt": (60, 80),
         "diseases": ["Rice Blast", "Bacterial Leaf Blight", "Sheath Blight", "Brown Spot"],
+    },
+    "Turmeric": {
+        "growth_stages": ["Sprouting", "Vegetative", "Rhizome Initiation", "Rhizome Development", "Maturity"],
+        "temp_opt": (20, 30),
+        "humidity_opt": (60, 80),
+        "soil_opt": (55, 75),
+        "diseases": ["Leaf Spot", "Rhizome Rot", "Leaf Blotch", "Colletotrichum Leaf Spot"],
     },
     "Tomato": {
         "growth_stages": ["Seedling", "Vegetative", "Flowering", "Fruit Set", "Ripening", "Harvest"],
@@ -47,7 +54,12 @@ def build_feature_vector(crop: str, temperature: float, humidity: float,
     Kept in one place so the training script and inference code always agree
     on feature order.
     """
-    crop_index = 0 if crop == "Rice" else 1
+    if crop == "Rice" or crop == "Paddy":
+        crop_index = 0
+    elif crop == "Turmeric":
+        crop_index = 1
+    else:
+        crop_index = 2
     return [temperature, humidity, soil_moisture, rainfall_7d, crop_index]
 
 

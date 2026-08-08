@@ -41,7 +41,7 @@ export default function Sidebar({ mobileOpen, onCloseMobile }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="overflow-hidden">
-              <div className="text-white font-semibold text-sm whitespace-nowrap">AgriSense EWS</div>
+              <div className="text-white font-semibold text-sm whitespace-nowrap">GeoCrop</div>
               <div className="text-[#90A4AE] text-[11.5px] whitespace-nowrap">Disease Early Warning</div>
             </div>
           )}

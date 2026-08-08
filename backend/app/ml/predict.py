@@ -36,22 +36,42 @@ from app.ml.feature_engineering import (
 
 settings = get_settings()
 
-MODEL_PATH = os.path.join(settings.model_dir, "trained_model.pkl")
-ENCODER_PATH = os.path.join(settings.model_dir, "label_encoder.pkl")
-
-
 @lru_cache
-def _load_artifacts():
-    """Load the trained model + label encoder once and cache them in memory."""
-    if os.path.exists(MODEL_PATH) and os.path.exists(ENCODER_PATH):
+def _load_crop_artifacts(crop: str):
+    """Load trained model + label encoder for a specific crop, if available."""
+    crop_key = crop.lower()
+    crop_model_path = os.path.join(settings.model_dir, crop_key, "trained_model.pkl")
+    crop_encoder_path = os.path.join(settings.model_dir, crop_key, "label_encoder.pkl")
+
+    if os.path.exists(crop_model_path) and os.path.exists(crop_encoder_path):
         try:
-            model = joblib.load(MODEL_PATH)
-            encoder = joblib.load(ENCODER_PATH)
+            model = joblib.load(crop_model_path)
+            encoder = joblib.load(crop_encoder_path)
             return model, encoder
         except Exception:
-            # Corrupt or incompatible artifact — fall back safely rather than crash.
-            return None, None
+            pass
+
+    # Root fallback check
+    root_model_path = os.path.join(settings.model_dir, "trained_model.pkl")
+    root_encoder_path = os.path.join(settings.model_dir, "label_encoder.pkl")
+    if os.path.exists(root_model_path) and os.path.exists(root_encoder_path):
+        try:
+            model = joblib.load(root_model_path)
+            encoder = joblib.load(root_encoder_path)
+            return model, encoder
+        except Exception:
+            pass
+
     return None, None
+
+
+def get_model_status_per_crop() -> dict:
+    crops = ["Paddy", "Turmeric", "Tomato"]
+    status = {}
+    for c in crops:
+        model, encoder = _load_crop_artifacts(c)
+        status[c] = (model is not None and encoder is not None)
+    return status
 
 
 def _risk_level(score: int) -> str:
@@ -90,7 +110,7 @@ def _explanation(crop: str, disease: str, risk_level: str, factors: list[dict]) 
 def _rule_based_predict(crop: str, temperature: float, humidity: float,
                          soil_moisture: float, rainfall_7d: float) -> dict:
     """Deterministic agronomic heuristic used until a trained model is provided."""
-    profile = CROP_PROFILES.get(crop, CROP_PROFILES["Rice"])
+    profile = CROP_PROFILES.get(crop, CROP_PROFILES.get("Rice", CROP_PROFILES["Paddy"]))
     factors = contributing_factors(crop, temperature, humidity, soil_moisture, rainfall_7d)
     weighted = sum(
         {"Humidity": 0.38, "Temperature": 0.28, "Soil Moisture": 0.22, "Recent Rainfall": 0.12}[f["factor"]]
@@ -127,7 +147,6 @@ def _rule_based_predict(crop: str, temperature: float, humidity: float,
     else:
         disease = profile["diseases"][-1]
 
-    confidence = round(clamp(72 + abs(risk_score - 50) / 50 * 22 + random.uniform(0, 4), 70, 98), 1)
     readiness, readiness_label = _readiness(risk_score, clamp((rainfall_7d / 120) * 100, 0, 100))
     explanation = _explanation(crop, disease, risk_level, factors)
 
@@ -136,7 +155,7 @@ def _rule_based_predict(crop: str, temperature: float, humidity: float,
         "disease": disease,
         "risk_level": risk_level,
         "risk_score": risk_score,
-        "confidence": confidence,
+        "confidence": None,
         "readiness_score": readiness,
         "readiness_label": readiness_label,
         "factors": factors,
@@ -180,26 +199,18 @@ def _model_predict(model, encoder, crop: str, temperature: float, humidity: floa
 def predict(sensor_data: dict) -> dict:
     """
     Main prediction entry point.
-
-    sensor_data: {
-        "crop": "Rice" | "Tomato",
-        "temperature": float,
-        "humidity": float,
-        "soil_moisture": float,
-        "rainfall_7d": float,
-    }
-
-    Returns a dict matching schemas.prediction.PredictionOut (minus id/created_at).
     """
-    crop = sensor_data.get("crop", "Rice")
+    crop = sensor_data.get("crop", "Paddy")
+    if crop == "Rice":
+        crop = "Paddy"
     if crop not in CROP_PROFILES:
-        crop = "Rice"
+        crop = "Paddy"
     temperature = float(sensor_data["temperature"])
     humidity = float(sensor_data["humidity"])
     soil_moisture = float(sensor_data["soil_moisture"])
     rainfall_7d = float(sensor_data.get("rainfall_7d", 0.0) or 0.0)
 
-    model, encoder = _load_artifacts()
+    model, encoder = _load_crop_artifacts(crop)
     if model is not None and encoder is not None:
         try:
             return _model_predict(model, encoder, crop, temperature, humidity, soil_moisture, rainfall_7d)

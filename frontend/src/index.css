@@ -2,20 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #2E7D32;
+  --color-primary-light: #E6F0E7;
+  --color-secondary: #1565C0;
+  --color-secondary-light: #E5EEFA;
+  --color-accent: #F9A825;
+  --color-accent-light: #FDF3DE;
+  --color-success: #43A047;
+  --color-success-light: #E8F5E9;
+  --color-warning: #FB8C00;
+  --color-warning-light: #FFF3E0;
+  --color-error: #D32F2F;
+  --color-error-light: #FDECEA;
+  --color-bg: #F5F7FA;
+  --color-card: #FFFFFF;
+  --color-sidebar: #263238;
+  --color-sidebar-hover: #37474F;
+  --color-border: #E0E0E0;
+  --color-text-primary: #263238;
+  --color-text-secondary: #607D8B;
+  --color-text-disabled: #9E9E9E;
+}
+
+.dark {
+  --color-primary: #43A047;
+  --color-primary-light: #1B3A20;
+  --color-secondary: #4FA3F7;
+  --color-secondary-light: #12283F;
+  --color-accent: #FFB84D;
+  --color-accent-light: #2D2312;
+  --color-success: #4CAF50;
+  --color-success-light: #173620;
+  --color-warning: #FFA726;
+  --color-warning-light: #3A2A10;
+  --color-error: #EF5350;
+  --color-error-light: #3A1414;
+  --color-bg: #161B1F;
+  --color-card: #1E252A;
+  --color-sidebar: #12171A;
+  --color-sidebar-hover: #1E252A;
+  --color-border: #2C363C;
+  --color-text-primary: #ECEFF1;
+  --color-text-secondary: #94A3AD;
+  --color-text-disabled: #5A656B;
+}
+
 html, body, #root {
   height: 100%;
 }
 
 body {
   margin: 0;
-  background: #F5F7FA;
+  background: var(--color-bg);
   font-family: "Inter", "Roboto", "Source Sans Pro", sans-serif;
-  color: #263238;
+  color: var(--color-text-primary);
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
 /* Skeleton loading shimmer */
 .skeleton {
-  background: linear-gradient(90deg, #ECEFF1 25%, #F5F7FA 37%, #ECEFF1 63%);
+  background: linear-gradient(90deg, var(--color-border) 25%, var(--color-bg) 37%, var(--color-border) 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
   border-radius: 6px;
@@ -30,7 +77,8 @@ body {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Sidebar nav hover */
-.nav-item:hover { background: #37474F; }
+.nav-item:hover { background: var(--color-sidebar-hover); }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #CFD8DC; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+
