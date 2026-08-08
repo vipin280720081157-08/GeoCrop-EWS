@@ -14,13 +14,13 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   secondary: "bg-secondary text-white border-secondary hover:brightness-95",
   success: "bg-success text-white border-success hover:brightness-95",
   danger: "bg-error text-white border-error hover:brightness-95",
-  outline: "bg-white text-textPrimary border-borderC hover:bg-bg",
+  outline: "bg-card text-textPrimary border-borderC hover:bg-bg",
   ghost: "bg-transparent text-textPrimary border-transparent hover:bg-bg",
 };
 
 export default function Button({ variant = "primary", icon: Icon, size = "md", className = "", children, disabled, ...rest }: ButtonProps) {
   const h = size === "sm" ? "h-9" : "h-11";
-  const disabledClasses = disabled ? "!bg-gray-200 !text-textDisabled !border-gray-200 cursor-not-allowed" : "cursor-pointer";
+  const disabledClasses = disabled ? "!bg-bg !text-textDisabled !border-borderC cursor-not-allowed" : "cursor-pointer";
   return (
     <button
       disabled={disabled}

@@ -79,7 +79,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       const healthData = await healthRes.json().catch(() => ({}));
-      const modelAvailable = !!healthData?.model_available;
+      const cropModelAvailable = healthData?.models_status?.[crop] ?? healthData?.model_available ?? false;
 
       // Check sensor data & GPS recency
       const sensorRes = await fetch(`${API_URL}/api/sensors/latest`).catch(() => null);
@@ -100,7 +100,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           backend: "online",
           dataService: hasRecentData ? "receiving" : "no_data",
           hardware: hasHardwareConnected ? "connected" : "offline",
-          aiModel: modelAvailable ? "available" : "unavailable",
+          aiModel: cropModelAvailable ? "available" : "unavailable",
           gps: gpsState,
         });
       } else {
@@ -109,7 +109,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           backend: "online",
           dataService: "no_data",
           hardware: "offline",
-          aiModel: modelAvailable ? "available" : "unavailable",
+          aiModel: cropModelAvailable ? "available" : "unavailable",
           gps: "unavailable",
         });
       }
@@ -123,7 +123,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         gps: "unavailable",
       });
     }
-  }, []);
+  }, [crop]);
 
   useEffect(() => {
     runStatusSweep();

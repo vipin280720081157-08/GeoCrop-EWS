@@ -20,7 +20,11 @@ class Settings(BaseSettings):
     # Path to the trained model artifacts.
     model_dir: str = "model"
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        protected_namespaces=("settings_",)
+    )
 
     @property
     def cors_origin_list(self) -> list[str]:
