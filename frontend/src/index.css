@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-app: #F5F7FA;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F0F4F8;
+  --border-color: #E0E6ED;
+  --text-main: #1A252C;
+  --text-muted: #5A6E7F;
+  --primary: #2E7D32;
+  --primary-light: #E8F5E9;
+  --secondary: #1565C0;
+  --secondary-light: #E3F2FD;
+  --accent: #D97706;
+  --accent-light: #FEF3C7;
+  --success: #2E7D32;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #2563EB;
+}
+
+html.dark {
+  --bg-app: #10161A;
+  --bg-card: #192228;
+  --bg-subtle: #212C34;
+  --border-color: #2D3C46;
+  --text-main: #F1F5F9;
+  --text-muted: #94A3B8;
+  --primary: #4ADE80;
+  --primary-light: rgba(74, 222, 128, 0.15);
+  --secondary: #60A5FA;
+  --secondary-light: rgba(96, 165, 250, 0.15);
+  --accent: #FBBF24;
+  --accent-light: rgba(251, 191, 36, 0.15);
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --error: #F87171;
+  --info: #60A5FA;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--bg-app);
+  font-family: "Inter", "Roboto", "Source Sans Pro", sans-serif;
+  color: var(--text-main);
+  overflow-x: hidden;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Base resets for forms, selects, options in dark mode */
+select option {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}
+
+/* Ensure clean continuous left edge */
+body, #root, aside, main, header {
+  border-left: none !important;
+  outline: none !important;
+}
+
+/* Skeleton loading shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #ECEFF1 25%, #F5F7FA 37%, #ECEFF1 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+html.dark .skeleton {
+  background: linear-gradient(90deg, #263238 25%, #1E272C 37%, #263238 63%);
+  background-size: 400% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Card + page fade-in */
+.fade-in { animation: fadeIn 150ms ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Sidebar nav hover */
+.nav-item:hover { background: #37474F; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #CFD8DC; border-radius: 4px; }
+html.dark ::-webkit-scrollbar-thumb { background: #37474F; }

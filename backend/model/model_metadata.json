@@ -1,0 +1,222 @@
+{
+  "model_version": "geocrop_v1_20260811",
+  "trained_at_utc": "2026-08-11T12:26:04.887977+00:00",
+  "dataset_version": "geocrop_master_v1",
+  "architecture": "single_unified_model_all_8_crops (crop_id included as a feature)",
+  "sklearn_version": "1.9.0",
+  "python_version": "3.12.13",
+  "feature_columns": [
+    "month",
+    "temperature_c",
+    "humidity_pct",
+    "soil_moisture_pct",
+    "temp_24h_avg_c",
+    "humidity_24h_avg_pct",
+    "soil_moisture_24h_avg_pct",
+    "crop_id_enc",
+    "stage_id_enc",
+    "division_id_enc",
+    "season_id_enc"
+  ],
+  "risk_model": {
+    "algorithm": "LightGBM",
+    "calibration": "CalibratedClassifierCV (isotonic, cv=3)",
+    "classes": [
+      "CRITICAL",
+      "HIGH",
+      "LOW",
+      "MEDIUM"
+    ],
+    "benchmark_results": [
+      {
+        "model": "LightGBM",
+        "cv_macro_f1_mean": 0.8575120844066099,
+        "cv_macro_f1_std": 0.0015486582133091393,
+        "val_accuracy": 0.8545146278994264,
+        "val_macro_f1": 0.8343714918049925,
+        "val_weighted_f1": 0.855543163486556,
+        "train_time_s": 34.4
+      },
+      {
+        "model": "XGBoost",
+        "cv_macro_f1_mean": 0.8570285442069324,
+        "cv_macro_f1_std": 0.0007696754559315779,
+        "val_accuracy": 0.8510876231016197,
+        "val_macro_f1": 0.8325569302580926,
+        "val_weighted_f1": 0.8521517825162024,
+        "train_time_s": 31.1
+      },
+      {
+        "model": "GradientBoosting",
+        "cv_macro_f1_mean": 0.849186848815795,
+        "cv_macro_f1_std": 0.000887623698443658,
+        "val_accuracy": 0.8392193643807944,
+        "val_macro_f1": 0.8198239980869855,
+        "val_weighted_f1": 0.8402962765163864,
+        "train_time_s": 442.1
+      },
+      {
+        "model": "RandomForest",
+        "cv_macro_f1_mean": 0.7742916436725077,
+        "cv_macro_f1_std": 0.004291874966095918,
+        "val_accuracy": 0.7224126113776559,
+        "val_macro_f1": 0.6931908445364343,
+        "val_weighted_f1": 0.7108905071612138,
+        "train_time_s": 27.3
+      },
+      {
+        "model": "LogisticRegression",
+        "cv_macro_f1_mean": 0.44994941690676765,
+        "cv_macro_f1_std": 0.0015973349847002252,
+        "val_accuracy": 0.52223945745103,
+        "val_macro_f1": 0.3446087709993579,
+        "val_weighted_f1": 0.48211917595682846,
+        "train_time_s": 23.0
+      }
+    ]
+  },
+  "disease_model": {
+    "algorithm": "XGBoost",
+    "calibration": "CalibratedClassifierCV (isotonic, cv=3)",
+    "classes": [
+      "banana_fusarium_wilt",
+      "banana_sigatoka_leaf_spot",
+      "coconut_bud_rot",
+      "coconut_fruit_rot",
+      "coconut_leaf_blight",
+      "coconut_root_wilt",
+      "groundnut_bud_necrosis",
+      "groundnut_collar_rot",
+      "groundnut_early_leaf_spot",
+      "groundnut_late_leaf_spot",
+      "groundnut_root_rot",
+      "groundnut_rust",
+      "maize_crazy_top_downy_mildew",
+      "maize_downy_mildew",
+      "maize_turcicum_leaf_blight",
+      "none",
+      "rice_bacterial_leaf_blight",
+      "rice_blast",
+      "rice_brown_spot",
+      "rice_false_smut",
+      "rice_grain_discoloration",
+      "rice_sheath_blight",
+      "rice_sheath_rot",
+      "rice_tungro_disease",
+      "sugarcane_pokkah_boeng",
+      "sugarcane_red_rot",
+      "sugarcane_rust",
+      "sugarcane_smut",
+      "sugarcane_yellow_leaf_disease",
+      "tapioca_cercospora_leaf_spot",
+      "tapioca_mosaic_disease",
+      "tapioca_tuber_rot",
+      "turmeric_leaf_spot",
+      "turmeric_rhizome_rot"
+    ],
+    "benchmark_results": [
+      {
+        "model": "XGBoost",
+        "cv_macro_f1_mean": 0.6336520733262461,
+        "cv_macro_f1_std": 0.002111211106845169,
+        "val_accuracy": 0.8007647631759316,
+        "val_macro_f1": 0.5727139622539125,
+        "val_weighted_f1": 0.7878567640014129,
+        "train_time_s": 239.3
+      },
+      {
+        "model": "RandomForest",
+        "cv_macro_f1_mean": 0.6126743077526768,
+        "cv_macro_f1_std": 0.002547441528960977,
+        "val_accuracy": 0.7008044442841167,
+        "val_macro_f1": 0.5059008176875865,
+        "val_weighted_f1": 0.6838945395490112,
+        "train_time_s": 26.3
+      },
+      {
+        "model": "LogisticRegression",
+        "cv_macro_f1_mean": 0.389429708577838,
+        "cv_macro_f1_std": 0.0018429317139488381,
+        "val_accuracy": 0.5840698387504059,
+        "val_macro_f1": 0.3118644142042205,
+        "val_weighted_f1": 0.5338580027279053,
+        "train_time_s": 149.6
+      },
+      {
+        "model": "LightGBM",
+        "cv_macro_f1_mean": 0.064721909571049,
+        "cv_macro_f1_std": 0.014395755912257498,
+        "val_accuracy": 0.3465603693950435,
+        "val_macro_f1": 0.1794139443550844,
+        "val_weighted_f1": 0.3272219983589748,
+        "train_time_s": 175.3
+      }
+    ]
+  },
+  "categorical_feature_encoders": {
+    "crop_id": [
+      "banana",
+      "coconut",
+      "groundnut",
+      "maize",
+      "rice",
+      "sugarcane",
+      "tapioca",
+      "turmeric"
+    ],
+    "stage_id": [
+      "booting",
+      "crop_maturity",
+      "flowering",
+      "fruit_development",
+      "fruit_maturity",
+      "fruit_set",
+      "grain_filling",
+      "grain_maturity",
+      "grand_growth_stem_elongation",
+      "harvesting",
+      "heading",
+      "juvenile_vegetative_growth",
+      "nut_development",
+      "nut_maturity",
+      "panicle_initiation",
+      "peg_formation",
+      "physiological_maturity",
+      "plant_establishment",
+      "pod_development",
+      "pod_filling",
+      "pollination",
+      "rhizome_development",
+      "rhizome_initiation",
+      "ripening_maturity",
+      "root_bulking",
+      "root_initiation",
+      "root_maturity",
+      "seed_germination",
+      "seed_germination_emergence",
+      "seed_rhizome_sprouting",
+      "seedling_establishment",
+      "sett_germination_shoot_emergence",
+      "shooting",
+      "silking",
+      "stem_cutting_sprouting",
+      "tasseling",
+      "tillering",
+      "vegetative_growth"
+    ],
+    "division_id": [
+      "bhavani",
+      "gobichettipalayam",
+      "main_erode",
+      "perundurai",
+      "sathyamangalam"
+    ],
+    "season_id": [
+      "northeast_monsoon",
+      "southwest_monsoon",
+      "summer",
+      "winter"
+    ]
+  },
+  "backend_integration_status": "NOT YET INTEGRATED \u2014 backend/app/ml/predict.py still uses the rule-based fallback only. See GeoCrop-Model-Training-Report.md for the required predict.py changes before these artifacts are live."
+}
