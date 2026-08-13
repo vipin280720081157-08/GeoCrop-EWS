@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard, Radio, Brain, ClipboardList, Menu, X, CloudRain,
+  LayoutDashboard, Radio, Cpu, Brain, ClipboardList, Menu, X, CloudRain,
   Sprout, Lightbulb, Bell, BarChart3, Settings as SettingsIcon
 } from "lucide-react";
 
@@ -16,6 +16,7 @@ export default function BottomNav() {
   ];
 
   const moreItems = [
+    { to: "/hardware", label: "3D Hardware", icon: Cpu },
     { to: "/weather", label: "Weather & Forecast", icon: CloudRain },
     { to: "/crop-stage", label: "Crop & Stage", icon: Sprout },
     { to: "/decision-support", label: "Recommendations", icon: Lightbulb },

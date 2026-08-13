@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard, Radio, CloudRain, Sprout, Brain, Lightbulb, CheckSquare, Bell,
+  LayoutDashboard, Radio, Cpu, CloudRain, Sprout, Brain, Lightbulb, CheckSquare, Bell,
   BarChart3, Settings as SettingsIcon, Leaf, X, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import { NAV_ITEMS } from "@/utils/constants";
@@ -9,6 +9,7 @@ import { NAV_ITEMS } from "@/utils/constants";
 const ICONS: Record<string, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   live: Radio,
+  hardware: Cpu,
   weather: CloudRain,
   crop_stage: Sprout,
   prediction: Brain,

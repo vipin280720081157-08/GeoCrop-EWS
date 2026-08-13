@@ -1,6 +1,7 @@
 export const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", path: "/" },
   { key: "live", label: "Live Field", path: "/live-monitoring" },
+  { key: "hardware", label: "3D Hardware", path: "/hardware" },
   { key: "weather", label: "Weather", path: "/weather" },
   { key: "crop_stage", label: "Crop & Stage", path: "/crop-stage" },
   { key: "prediction", label: "Risk Analysis", path: "/disease-prediction" },

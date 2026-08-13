@@ -6,6 +6,7 @@ import { GeoCropProvider } from "@/context/AppContext";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Dashboard from "@/pages/Dashboard";
 import LiveMonitoring from "@/pages/LiveMonitoring";
+import HardwarePage from "@/pages/HardwarePage";
 import WeatherPage from "@/pages/WeatherPage";
 import CropStagePage from "@/pages/CropStagePage";
 import DiseasePrediction from "@/pages/DiseasePrediction";
@@ -26,6 +27,7 @@ export default function App() {
             <Route element={<DashboardLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/live-monitoring" element={<LiveMonitoring />} />
+              <Route path="/hardware" element={<HardwarePage />} />
               <Route path="/weather" element={<WeatherPage />} />
               <Route path="/crop-stage" element={<CropStagePage />} />
               <Route path="/disease-prediction" element={<DiseasePrediction />} />
