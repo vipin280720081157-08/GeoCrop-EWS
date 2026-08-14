@@ -42,11 +42,11 @@ export const HARDWARE_COMPONENTS: Record<string, ComponentInfo> = {
   gps: {
     id: "gps",
     name: "NEO-6M GPS",
-    category: "Connected Hardware",
-    status: "CONNECTED",
-    description: "Geographic positioning module",
-    purpose: "Provides latitude and longitude coordinates for GIS mapping.",
-    details: "Requires open-sky visibility for satellite fix. Reports indoor fix baseline when indoors.",
+    category: "Planned Extension",
+    status: "NOT CONNECTED",
+    description: "Geographic positioning module (Disconnected in test setup)",
+    purpose: "Module is physically disconnected in current indoor setup. Connect outdoors for live satellite positioning.",
+    details: "Requires satellite visibility and physical hardware connection. Marked not connected for indoor testing.",
   },
   npk: {
     id: "npk",
@@ -354,7 +354,7 @@ export default function Hardware3DScene({
     // Add Wires
     setupGroup.add(createWire(new THREE.Vector3(-3.5, 0.4, -2.2), new THREE.Vector3(-1.0, 0.2, -0.5), 0xef4444)); // DHT22
     setupGroup.add(createWire(new THREE.Vector3(-3.5, 0.6, 2.2), new THREE.Vector3(-1.0, 0.2, 0.5), 0x22c55e));  // Soil Sensor
-    setupGroup.add(createWire(new THREE.Vector3(3.5, 0.3, -2.2), new THREE.Vector3(1.0, 0.2, -0.5), 0x3b82f6));   // GPS
+    setupGroup.add(createWire(new THREE.Vector3(3.5, 0.3, -2.2), new THREE.Vector3(1.0, 0.2, -0.5), 0x64748b, true));   // GPS (Dashed)
     setupGroup.add(createWire(new THREE.Vector3(3.5, 0.5, 2.2), new THREE.Vector3(1.0, 0.2, 0.5), 0xf59e0b, true)); // NPK (Dashed)
     setupGroup.add(createWire(new THREE.Vector3(0, 0.4, -3.2), new THREE.Vector3(0, 0.2, -1.5), 0x64748b, true));   // Rain (Dashed)
 

@@ -59,8 +59,14 @@ const char* WIFI_PASSWORD = "cube463544";
 // as an empty string:
 //
 // const char* BACKEND_URL = "";
+// Change from:
+// const char* BACKEND_URL = "http://10.93.148.249:8000";
 
-const char* BACKEND_URL = "http://10.93.148.249:8000";
+// Change to your live Render Backend URL:
+const char* BACKEND_URL = "https://geocrop-ews-api.onrender.com";
+
+
+// const char* BACKEND_URL = "http://10.93.148.249:8000";
 
 const char* DEVICE_ID = "ESP32_01";
 

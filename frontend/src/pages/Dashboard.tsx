@@ -37,10 +37,9 @@ export default function Dashboard() {
     );
   };
 
-  const hasSensor = !!sensor;
-  const dhtConnected = (connected || hasSensor) && sensor?.temperature !== undefined && sensor?.temperature !== null;
-  const soilConnected = (connected || hasSensor) && sensor?.soil_moisture !== undefined && sensor?.soil_moisture !== null && sensor?.soil_moisture !== 0;
-  const gpsConnected = (connected || hasSensor) && !!sensor?.latitude && !!sensor?.longitude;
+  const isHardwareConnected = connected && !!sensor;
+  const soilConnected = isHardwareConnected && sensor?.soil_moisture !== undefined && sensor?.soil_moisture !== null && sensor?.soil_moisture !== 0;
+  const gpsConnected = isHardwareConnected && !!sensor?.latitude && !!sensor?.longitude;
 
   // Determine overall field status state
   const riskLevel = prediction?.risk_level ?? "LOW";
@@ -70,11 +69,17 @@ export default function Dashboard() {
             <span>{selectedCrop} • {selectedStage.replace(/_/g, " ")}</span>
           </div>
           <div className="text-xs text-textSecondary dark:text-darkTextSecondary mt-1 flex items-center gap-2">
-            <span>Last updated: {sensor ? formatTime(sensor.created_at) : "2 min ago"}</span>
+            <span>Last updated: {isHardwareConnected && sensor ? formatTime(sensor.created_at) : "Awaiting transmission"}</span>
             <span>•</span>
-            <span className="flex items-center gap-1 font-semibold text-success">
-              <Radio size={12} /> {dhtConnected ? "Sensors connected" : "Partial sensor data"}
-            </span>
+            {isHardwareConnected ? (
+              <span className="flex items-center gap-1 font-semibold text-success">
+                <Radio size={12} /> Sensors connected
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400">
+                <Radio size={12} /> Hardware Offline / Waiting for Data
+              </span>
+            )}
           </div>
         </div>
         <Button variant="outline" onClick={() => navigate("/crop-stage")}>

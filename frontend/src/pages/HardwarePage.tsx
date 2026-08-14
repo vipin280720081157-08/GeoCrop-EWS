@@ -41,7 +41,7 @@ export default function HardwarePage() {
               ● {connectedCount} Connected
             </span>
             <span className="px-3 py-1.5 rounded-full text-xs font-extrabold bg-slate-900 text-amber-300 border border-amber-500/50 flex items-center gap-1.5">
-              ○ {plannedCount} Planned
+              ● {plannedCount} Planned
             </span>
           </div>
         </div>
