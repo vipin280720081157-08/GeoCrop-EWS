@@ -25,6 +25,14 @@ class Recommendation(BaseModel):
     priority: str  # Low | Medium | High
 
 
+class ActionItem(BaseModel):
+    id: str
+    text: str
+    category: str
+    completed: bool
+    priority: str
+
+
 class PredictionOut(BaseModel):
     id: Optional[int] = None
     crop: str
@@ -36,9 +44,11 @@ class PredictionOut(BaseModel):
     readiness_label: Optional[str] = None
     factors: List[ContributingFactor] = []
     recommendations: List[Recommendation] = []
+    tasks: List[ActionItem] = []
     explanation: Optional[str] = None
     source: Optional[str] = None            # "trained_model" | "rule_based_fallback"
     model_version: Optional[str] = None      # e.g. "geocrop_v1", null for rule-based
     created_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True, "protected_namespaces": ()}
+

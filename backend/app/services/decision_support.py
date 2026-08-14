@@ -72,6 +72,103 @@ def build_recommendations(prediction: dict, sensor: dict, crop: str) -> list[dic
     return deduped[:5]
 
 
+def build_tasks(prediction: dict, sensor: dict, crop: str) -> list[dict]:
+    """Generates dynamic daily task items derived from current prediction and telemetry."""
+    profile = CROP_PROFILES.get(crop, CROP_PROFILES["rice"])
+    disease = prediction.get("disease", "none")
+    disease_label = disease.replace("_", " ").title() if disease and disease != "none" else "disease symptoms"
+    risk_level = prediction.get("risk_level", "LOW")
+    soil_hi = profile["soil_opt"][1]
+    hum_hi = profile["humidity_opt"][1]
+    
+    tasks = []
+    
+    # Task 1: Inspection
+    if risk_level in HIGH_PRIORITY_LEVELS:
+        tasks.append({
+            "id": "t1",
+            "text": f"Conduct urgent canopy check for {disease_label} lesions on {crop.title()}",
+            "category": "Crop Inspection",
+            "completed": False,
+            "priority": "High",
+        })
+    elif risk_level == "MEDIUM":
+        tasks.append({
+            "id": "t1",
+            "text": f"Inspect leaf canopy for early symptoms of {disease_label}",
+            "category": "Crop Inspection",
+            "completed": False,
+            "priority": "Medium",
+        })
+    else:
+        tasks.append({
+            "id": "t1",
+            "text": f"Routine canopy check for {crop.title()} health and foliage status",
+            "category": "Crop Inspection",
+            "completed": False,
+            "priority": "Low",
+        })
+
+    # Task 2: Irrigation & Soil Drainage
+    soil_m = sensor.get("soil_moisture", 50.0)
+    rain_7d = sensor.get("rainfall_7d", 0.0) or 0.0
+    if soil_m > soil_hi or rain_7d > 30.0:
+        tasks.append({
+            "id": "t2",
+            "text": "Inspect field drainage channels and confirm surplus water discharge",
+            "category": "Irrigation",
+            "completed": False,
+            "priority": "High",
+        })
+    else:
+        tasks.append({
+            "id": "t2",
+            "text": "Check soil moisture baseline and evaluate irrigation needs",
+            "category": "Irrigation",
+            "completed": False,
+            "priority": "Medium",
+        })
+
+    # Task 3: Environmental / Humidity Monitoring
+    hum = sensor.get("humidity", 50.0)
+    if hum > hum_hi:
+        tasks.append({
+            "id": "t3",
+            "text": f"Monitor high relative humidity ({hum:.1f}%) and increase airflow between crop rows",
+            "category": "Monitoring",
+            "completed": False,
+            "priority": "High" if risk_level in HIGH_PRIORITY_LEVELS else "Medium",
+        })
+    else:
+        tasks.append({
+            "id": "t3",
+            "text": "Record daily ambient microclimate readings and leaf wetness duration",
+            "category": "Monitoring",
+            "completed": True,
+            "priority": "Low",
+        })
+
+    # Task 4: Weather Review
+    tasks.append({
+        "id": "t4",
+        "text": "Review 7-day regional weather forecast before scheduling farm activities",
+        "category": "General",
+        "completed": True,
+        "priority": "Low",
+    })
+
+    # Task 5: Hardware Check
+    tasks.append({
+        "id": "t5",
+        "text": "Verify ESP32 telemetry hardware and sensor data transmission",
+        "category": "General",
+        "completed": True,
+        "priority": "Low",
+    })
+
+    return tasks
+
+
 def environmental_warnings(sensor: dict, crop: str) -> list[dict]:
     profile = CROP_PROFILES.get(crop, CROP_PROFILES["rice"])
     warnings = []
@@ -84,3 +181,4 @@ def environmental_warnings(sensor: dict, crop: str) -> list[dict]:
     if not warnings:
         warnings.append({"text": "All monitored parameters are currently within the optimal range.", "level": "Low"})
     return warnings
+

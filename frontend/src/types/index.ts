@@ -46,6 +46,7 @@ export interface Prediction {
   readiness_label?: string | null;
   factors: ContributingFactor[];
   recommendations: Recommendation[];
+  tasks?: ActionItem[];
   explanation?: string | null;
   source?: string | null;          // "trained_model" | "rule_based_fallback"
   model_version?: string | null;    // e.g. "geocrop_v1", null for rule-based

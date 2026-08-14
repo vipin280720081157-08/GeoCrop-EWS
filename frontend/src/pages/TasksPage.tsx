@@ -3,28 +3,35 @@ import { ClipboardList, CheckSquare, Square, Filter } from "lucide-react";
 import Card from "@/components/Card";
 import SectionTitle from "@/components/SectionTitle";
 
+import { useGeoCrop } from "@/context/AppContext";
+
 interface TaskItem {
   id: string;
   text: string;
-  category: "Monitoring" | "Irrigation" | "Crop Inspection" | "General";
+  category: "Monitoring" | "Irrigation" | "Crop Inspection" | "General" | string;
   completed: boolean;
-  priority: "High" | "Medium" | "Low";
+  priority: "High" | "Medium" | "Low" | string;
 }
 
 export default function TasksPage() {
+  const { prediction } = useGeoCrop();
   const [filter, setFilter] = useState<string>("All");
-  const [tasks, setTasks] = useState<TaskItem[]>([
+  const [completedMap, setCompletedMap] = useState<Record<string, boolean>>({});
+
+  const defaultTasks: TaskItem[] = [
     { id: "t1", text: "Inspect leaf canopy for early lesion symptoms", category: "Crop Inspection", completed: false, priority: "High" },
     { id: "t2", text: "Confirm field drainage channel status before next rain cycle", category: "Irrigation", completed: false, priority: "High" },
     { id: "t3", text: "Monitor relative humidity and canopy wetness twice daily", category: "Monitoring", completed: true, priority: "Medium" },
     { id: "t4", text: "Verify ESP32 telemetry hardware connection status", category: "General", completed: true, priority: "Low" },
     { id: "t5", text: "Reassess soil moisture baseline when sensor recalibrates", category: "Monitoring", completed: false, priority: "Medium" },
-  ]);
+  ];
+
+  const tasks: TaskItem[] = (prediction?.tasks && prediction.tasks.length > 0)
+    ? (prediction.tasks as TaskItem[])
+    : defaultTasks;
 
   const toggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
+    setCompletedMap((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const filteredTasks = tasks.filter(
@@ -65,29 +72,32 @@ export default function TasksPage() {
       <Card>
         <SectionTitle icon={ClipboardList}>Today's Action Tasks</SectionTitle>
         <div className="flex flex-col gap-2.5">
-          {filteredTasks.map((t) => (
-            <div
-              key={t.id}
-              onClick={() => toggleTask(t.id)}
-              className={`flex items-center gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${
-                t.completed
-                  ? "bg-successLight/40 border-success/30 text-textSecondary line-through"
-                  : "bg-bg dark:bg-darkBg border-borderC dark:border-darkBorderC text-textPrimary hover:border-primary"
-              }`}
-            >
-              {t.completed ? (
-                <CheckSquare size={20} className="text-success flex-shrink-0" />
-              ) : (
-                <Square size={20} className="text-textSecondary flex-shrink-0" />
-              )}
-              <div className="flex-1">
-                <div className="text-xs sm:text-sm font-semibold">{t.text}</div>
-                <div className="text-[11px] text-textSecondary mt-0.5">
-                  Category: {t.category} · Priority: {t.priority}
+          {filteredTasks.map((t) => {
+            const isCompleted = completedMap[t.id] ?? t.completed;
+            return (
+              <div
+                key={t.id}
+                onClick={() => toggleTask(t.id)}
+                className={`flex items-center gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${
+                  isCompleted
+                    ? "bg-successLight/40 border-success/30 text-textSecondary line-through"
+                    : "bg-bg dark:bg-darkBg border-borderC dark:border-darkBorderC text-textPrimary hover:border-primary"
+                }`}
+              >
+                {isCompleted ? (
+                  <CheckSquare size={20} className="text-success flex-shrink-0" />
+                ) : (
+                  <Square size={20} className="text-textSecondary flex-shrink-0" />
+                )}
+                <div className="flex-1">
+                  <div className="text-xs sm:text-sm font-semibold">{t.text}</div>
+                  <div className="text-[11px] text-textSecondary mt-0.5">
+                    Category: {t.category} · Priority: {t.priority}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {filteredTasks.length === 0 && (
             <div className="text-xs text-textSecondary p-6 text-center">

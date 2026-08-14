@@ -16,7 +16,7 @@ from app.models.sensor_reading import SensorReading
 from app.models.prediction import Prediction
 from app.schemas.prediction import PredictionRequest, PredictionOut
 from app.ml.predict import predict
-from app.services.decision_support import build_recommendations
+from app.services.decision_support import build_recommendations, build_tasks
 from app.utils.logger import get_logger
 
 router = APIRouter(prefix="/api", tags=["Predictions"])
@@ -74,7 +74,9 @@ def run_prediction(payload: PredictionRequest | None = None, db: Session = Depen
 
     result = predict(sensor_dict)
     recommendations = build_recommendations(result, sensor_dict, sensor_dict["crop"])
+    tasks = build_tasks(result, sensor_dict, sensor_dict["crop"])
     result["recommendations"] = recommendations
+    result["tasks"] = tasks
 
     prediction = Prediction(
         crop=result["crop"],
@@ -94,7 +96,12 @@ def run_prediction(payload: PredictionRequest | None = None, db: Session = Depen
     db.add(prediction)
     db.commit()
     db.refresh(prediction)
-    logger.info("Prediction id=%s disease=%s risk=%s source=%s", prediction.id, prediction.disease, prediction.risk_level, prediction.source)
+    logger.info(
+        "[PREDICTION DEBUG] crop=%s stage=%s temp=%.1f hum=%.1f soil=%.1f -> disease=%s risk=%s confidence=%.1f%% source=%s",
+        sensor_dict["crop"], sensor_dict.get("growth_stage"), sensor_dict["temperature"],
+        sensor_dict["humidity"], sensor_dict["soil_moisture"], prediction.disease,
+        prediction.risk_level, prediction.confidence, prediction.source,
+    )
 
     return PredictionOut(
         id=prediction.id,
@@ -107,6 +114,7 @@ def run_prediction(payload: PredictionRequest | None = None, db: Session = Depen
         readiness_label=prediction.readiness_label,
         factors=prediction.factors or [],
         recommendations=prediction.recommendations or [],
+        tasks=tasks,
         explanation=prediction.explanation,
         source=prediction.source,
         model_version=prediction.model_version,
@@ -119,6 +127,15 @@ def get_latest_prediction(db: Session = Depends(get_db)):
     prediction = db.query(Prediction).order_by(Prediction.created_at.desc()).first()
     if not prediction:
         raise HTTPException(status_code=404, detail="No predictions available yet.")
+    pred_dict = {
+        "crop": prediction.crop,
+        "disease": prediction.disease,
+        "risk_level": prediction.risk_level,
+        "risk_score": prediction.risk_score,
+        "confidence": prediction.confidence,
+    }
+    dummy_sensor = {"temperature": 27.0, "humidity": 70.0, "soil_moisture": 55.0, "rainfall_7d": 10.0}
+    tasks = build_tasks(pred_dict, dummy_sensor, prediction.crop)
     return PredictionOut(
         id=prediction.id,
         crop=prediction.crop,
@@ -130,6 +147,7 @@ def get_latest_prediction(db: Session = Depends(get_db)):
         readiness_label=prediction.readiness_label,
         factors=prediction.factors or [],
         recommendations=prediction.recommendations or [],
+        tasks=tasks,
         explanation=prediction.explanation,
         source=prediction.source,
         model_version=prediction.model_version,
@@ -142,14 +160,17 @@ def get_prediction_history(limit: int = 50, db: Session = Depends(get_db)):
     """Extra convenience endpoint (beyond the minimum spec) powering the
     Historical Analytics page's Prediction History table."""
     predictions = db.query(Prediction).order_by(Prediction.created_at.desc()).limit(limit).all()
+    dummy_sensor = {"temperature": 27.0, "humidity": 70.0, "soil_moisture": 55.0, "rainfall_7d": 10.0}
     return [
         PredictionOut(
             id=p.id, crop=p.crop, disease=p.disease, risk_level=p.risk_level,
             risk_score=p.risk_score, confidence=p.confidence,
             readiness_score=p.readiness_score, readiness_label=p.readiness_label,
             factors=p.factors or [], recommendations=p.recommendations or [],
+            tasks=build_tasks({"crop": p.crop, "disease": p.disease, "risk_level": p.risk_level}, dummy_sensor, p.crop),
             explanation=p.explanation, source=p.source, model_version=p.model_version,
             created_at=p.created_at,
         )
         for p in predictions
     ]
+

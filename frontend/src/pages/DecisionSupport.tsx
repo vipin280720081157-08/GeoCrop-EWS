@@ -43,13 +43,13 @@ export default function DecisionSupport() {
       <Card className="border-l-4 border-l-primary">
         <SectionTitle icon={Lightbulb}>PRIMARY RECOMMENDED ACTION</SectionTitle>
         <div className="text-lg font-bold text-textPrimary mb-2">
-          Inspect crop leaves and verify canopy ventilation today.
+          {recommendations[0]?.text ?? "Inspect crop leaves and verify canopy ventilation today."}
         </div>
         <p className="m-0 text-xs sm:text-sm text-textSecondary leading-relaxed mb-3">
-          Why? Current humidity and temperature metrics warrant close monitoring during <strong>{selectedCrop} ({selectedStage.replace(/_/g, " ")})</strong>.
+          Why? Current environmental metrics and ML risk assessment (<strong>{prediction?.risk_level ?? "LOW"} risk</strong> of <strong>{prediction?.disease ? prediction.disease.replace(/_/g, " ") : "disease"}</strong>) warrant close monitoring during <strong className="capitalize">{selectedCrop} ({selectedStage.replace(/_/g, " ")})</strong>.
         </p>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-warningLight text-warning">
-          Priority: Medium
+          Priority: {recommendations[0]?.priority ?? "Medium"}
         </div>
       </Card>
 

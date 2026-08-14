@@ -83,24 +83,6 @@ export const GeoCropProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [selectedCrop, selectedStage]);
 
-  // Initial prediction & weather load
-  useEffect(() => {
-    refreshWeather();
-    fetchLatestPrediction()
-      .then((pred) => {
-        setPrediction(pred);
-        if (pred.crop && LOCKED_CROPS.some((c) => c.id === pred.crop)) {
-          setSelectedCropState(pred.crop);
-        }
-      })
-      .catch(() => {});
-  }, [refreshWeather]);
-
-  // Trigger alert rule evaluation whenever telemetry updates
-  useEffect(() => {
-    evaluateRules(sensor, weather, prediction, selectedCrop, selectedStage);
-  }, [sensor, weather, prediction, selectedCrop, selectedStage, evaluateRules]);
-
   // Execute trained-model prediction
   const executePrediction = useCallback(async () => {
     setPredicting(true);
@@ -121,6 +103,23 @@ export const GeoCropProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setPredicting(false);
     }
   }, [selectedCrop, selectedStage, sensor, weather]);
+
+  // Initial prediction & weather load
+  useEffect(() => {
+    refreshWeather();
+    executePrediction();
+  }, [refreshWeather, executePrediction]);
+
+  // Automatically re-run ML prediction whenever crop or growth stage changes
+  useEffect(() => {
+    executePrediction();
+  }, [selectedCrop, selectedStage, executePrediction]);
+
+  // Trigger alert rule evaluation whenever telemetry updates
+  useEffect(() => {
+    evaluateRules(sensor, weather, prediction, selectedCrop, selectedStage);
+  }, [sensor, weather, prediction, selectedCrop, selectedStage, evaluateRules]);
+
 
   return (
     <AppContext.Provider
